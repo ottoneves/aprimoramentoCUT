@@ -80,4 +80,9 @@ write.csv(amostra1.df,"~/R/df_amostra1.csv", row.names = FALSE)
 # ?? existe um padrão para citar autores?
 
 # REFERÊNCIAS: 
-# ?? existe um padrão para citar referências? 
+# 
+#Fabiana Zioti, Felipe Menino Carlos, Felipe Carvalho de Souza, Rennan F. B. Marujo, Karine Reis Ferreira, Gilberto R. Queiroz. Notebook Kaggle: https://www.kaggle.com/code/manuelaalvarenga/ibge-wlts-example-r
+#
+#Ferreira, K.R.; Queiroz, G.R.; Vinhas, L.; Marujo, R.F.B.; Simoes, R.E.O.; Picoli, M.C.A.; Camara, G.; Cartaxo, R.; Gomes, V.C.F.; Santos, L.A.; Sanchez, A.H.; Arcanjo, J.S.; Fronza, J.G.; Noronha, C.A.; Costa, R.W.; Zaglia, M.C.; Zioti, F.; Korting, T.S.; Soares, A.R.; Chaves, M.E.D.; Fonseca, L.M.G. 2020. Earth Observation Data Cubes for Brazil: Requirements, Methodology and Products. Remote Sens. 12, no. 24: 4033. DOI: 10.3390/rs12244033.
+#
+#Zioti, F.; Gomes, V.C.F.; Ferreira, K.R.; Queiroz, G.R.; Rodriguez, E. L. 2019. Um ambiente para acesso e análise de trajetórias de uso e cobertura da Terra. Anais do XIX Simpósio Brasileiro de Sensoriamento Remoto.São José dos Campos, INPE, 2019. Online .
