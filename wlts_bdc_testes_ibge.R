@@ -27,37 +27,58 @@ plot(amostra1_shp$geometry)
 #Chamando o serviço R_wlts
 wlts_bdc <- "https://brazildatacube.dpi.inpe.br/wlts/"
 
+#Listando a coleções disponíveis
+rwlts::list_collections(wlts_bdc)
+
 #Buscando a trajetória dos pontos no MCUT (IBGE)
 amostra1_trj_ibge <- get_trajectory(wlts_bdc,
                                     latitude = amostra1_shp$top,
                                     longitude = amostra1_shp$left,
                                     collections = "ibge_cobertura_uso_terra")
 head(amostra1_trj_ibge$result)
-
+amostra1_ibge_df <- as(amostra1_trj_ibge$result, "data.frame")
+head(amostra1_ibge_df)
 
 #Filtrando as áreas que permanecem estáveis no MCUT-IBGE
-# ?? como fazer um loop que faça uma busca por: agrupado por "point_id", quem, para cada "date", manteve a mesma "class".
+amostra1_ibge_filtrada <- amostra1_ibge_df %>% group_by(point_id) %>% summarize(
+  n = n(),
+  n_class = length(unique(class))
+) %>% filter(n_class == 1)
+
+head(amostra1_ibge_filtrada)
+
+#Criando um dataframe com a latitude e longitude dos pontos filtrados a partir do shapefile original
+amostra1_latlong.df <- data.frame(point_id=amostra1_shp$id, lat=amostra1_shp$top, long=amostra1_shp$left)
+head(amostra1_latlong.df)
+
+#Criando dataframe da amostra de áreas estáveis 
+amostra1_estaveis.df <- merge(x=amostra1_ibge_filtrada, y=amostra1_latlong.df, by="point_id")
+View(amostra1_estaveis.df)
+
 
 #Pegar o valor das classe do IBGE para o ano de 2018
-amostra1_ibge_2018 <- filter(amostra1_trj_ibge$result, date == 2018)
+amostra1_estaveis_ibge <- get_trajectory(wlts_bdc, 
+                                     latitude = amostra1_estaveis.df$lat, 
+                                     longitude = amostra1_estaveis.df$long, 
+                                     collections = "ibge_cobertura_uso_terra")
 
+amostra1_ibge_2018 <- filter(amostra1_estaveis_ibge$result, date == 2018)
 head(amostra1_ibge_2018)
 
-
 #Trajetórias dos outros mapeamentos
-#Amostra Mapbiomas Cerrado v. 5
+#Amostra Mapbiomasv. 6
 amostra1_mapbiomas <- get_trajectory(wlts_bdc, 
-                                     latitude = amostra1_shp$top, 
-                                     longitude = amostra1_shp$left, 
-                                     collections = "mapbiomas_cerrado-v5")
+                                     latitude = amostra1_estaveis.df$lat, 
+                                     longitude = amostra1_estaveis.df$long, 
+                                     collections = "mapbiomas-v6")
 
 amostra1_mapbiomas_2018 <- filter(amostra1_mapbiomas$result, date == 2018)
 head(amostra1_mapbiomas_2018)
 
 #Amostra TerraClass Cerrado
 amostra1_terraclass <- get_trajectory(wlts_bdc, 
-                                      latitude = amostra1_shp$top, 
-                                      longitude = amostra1_shp$left, 
+                                      latitude = amostra1_estaveis.df$lat, 
+                                      longitude = amostra1_estaveis.df$long, 
                                       collections = "terraclass_cerrado")
 
 amostra1_terraclass_2018 <- filter(amostra1_terraclass$result, date == 2018)
@@ -65,7 +86,7 @@ amostra1_terraclass_2018 <- filter(amostra1_terraclass$result, date == 2018)
 head(amostra1_terraclass_2018)
 
 #Olhar as amostras juntas em um mesmo dataframe
-amostra1.df <- data.frame(id=amostra1_ibge_2018$point_id, ibge_2018=amostra1_ibge_2018$class, mapbiomas_2018=amostra1_mapbiomas_2018$class, terraclass=amostra1_terraclass_2018$class)
+amostra1.df <- data.frame(id=amostra1_estaveis.df$point_id, lat=amostra1_estaveis.df$lat, long=amostra1_estaveis.df$long, ibge_2018=amostra1_ibge_2018$class, mapbiomas_2018=amostra1_mapbiomas_2018$class, terraclass=amostra1_terraclass_2018$class)
 amostra1.df
 
 #Criar regras para "tradução" de legenda e criar campo novo "label" 
