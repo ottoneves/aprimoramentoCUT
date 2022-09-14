@@ -1,0 +1,87 @@
+---
+title: "correcao_amostras"
+output: html_document
+date: '2022-06-27'
+---
+
+# Carregando Pacotes
+
+```{r}
+
+library(readr)
+library(sf)
+library(dplyr)
+
+```
+
+# Lendo Arquivos
+
+```{r}
+
+amostras_jpa <- sf::st_read("D:/0_aprimora/github/amostras_jpa/Treinamento_4674_pontos_latlong_utf8.shp")
+#tiles_bdc_formosa <- sf::st_read("D:/correcao_amostras/tiles_sentinel_agformosa.shp")
+#legenda <- read_delim("D:/correcao_amostras/2022_mai_legenda_n3.txt", delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+```
+
+# Junção Espacial
+
+```{r}
+
+#ibge_wlts_samples_tiles <- sf::st_join(x = ibge_wlts_samples, y = tiles_bdc_formosa)
+
+```
+
+# Criar objeto dataframe das amostras
+
+```{r}
+
+amostras_jpa_tab <- sf::st_drop_geometry(amostras_jpa)
+
+```
+
+# Corrigindo nome do campo, executando junção de tabela para adequar ao padrão bdc
+
+```{r}
+
+amostras_jpa_tab <- amostras_jpa_tab %>% 
+    dplyr::rename(longitude = x, latitude = y, label = Classname)
+
+```
+# Removendo colunas inúteis
+
+```{r}
+
+amostras_jpa_tab <- dplyr::select(amostras_jpa_tab, !c(Classvalue, RED, BLUE, GREEN, Count))
+
+```
+
+
+# Exportando CSV
+
+```{r}
+
+write.csv(amostras_jpa_tab, "amostras_jpa.csv", fileEncoding = "utf-8")
+
+```
+
+# Exportando CSV por Tile
+
+```{r}
+
+unique_tiles <- unique(amostras_tile_drf_biom_shp$tile)
+
+for(i in unique_tiles){
+  st_write(filter(amostras_tile_drf_biom_shp, tile == i), paste0(i, ".shp"))
+}
+
+
+```
+
+
+
+
+
+
+
+
